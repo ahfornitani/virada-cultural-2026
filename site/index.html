@@ -97,6 +97,16 @@
           até
           <select id="timeTo"><option value="">Fim</option></select>
         </label>
+        <div class="wide time-presets" role="group" aria-label="Períodos do dia">
+          <button class="button ghost" type="button" data-from="06:00" data-to="12:00">Manhã</button>
+          <button class="button ghost" type="button" data-from="12:00" data-to="18:00">Tarde</button>
+          <button class="button ghost" type="button" data-from="18:00" data-to="23:30">Noite</button>
+          <button class="button ghost" type="button" data-from="00:00" data-to="06:00">Madrugada</button>
+        </div>
+        <label class="checkbox">
+          <input id="nameOnly" type="checkbox" />
+          Buscar só no nome do evento
+        </label>
         <label class="checkbox">
           <input id="favoritesOnly" type="checkbox" />
           Mostrar só favoritos
@@ -107,11 +117,9 @@
         </label>
       </div>
 
-      <div class="time-presets" role="group" aria-label="Períodos do dia">
-        <button class="button ghost" type="button" data-from="06:00" data-to="12:00">Manhã</button>
-        <button class="button ghost" type="button" data-from="12:00" data-to="18:00">Tarde</button>
-        <button class="button ghost" type="button" data-from="18:00" data-to="23:30">Noite</button>
-        <button class="button ghost" type="button" data-from="00:00" data-to="06:00">Madrugada</button>
+      <div class="artist-chips" role="group" aria-label="Artistas em destaque">
+        <span class="eyebrow chips-label">Artistas em destaque</span>
+        <div id="artistChips" class="chips"></div>
       </div>
     </section>
 

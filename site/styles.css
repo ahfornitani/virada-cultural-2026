@@ -284,6 +284,18 @@ textarea:focus {
   display: grid;
   overflow: hidden;
   border-radius: 26px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.event-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 60px rgba(38, 20, 71, 0.18);
+}
+
+.event-card .button,
+.event-card a {
+  cursor: pointer;
 }
 
 .event-card img {
@@ -445,6 +457,24 @@ footer .credits {
   font-weight: 500;
   text-transform: none;
   letter-spacing: 0;
+}
+
+.artist-chips {
+  margin-top: 14px;
+}
+.chips-label {
+  display: block;
+  margin-bottom: 8px;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  padding: 6px 12px;
+  min-height: 32px;
+  font-size: 0.85rem;
 }
 
 @media (max-width: 980px) {

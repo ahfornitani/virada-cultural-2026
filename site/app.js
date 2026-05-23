@@ -1,6 +1,84 @@
 const FAVORITES_KEY = "virada-cultural-2026-v3:favorites";
 const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
 
+const FEATURED_ARTISTS = [
+  "Alexandre Pires",
+  "Ana Cañas",
+  "Banda Ira!",
+  "Beto Barbosa",
+  "Biquini Cavadão",
+  "Black Pantera",
+  "Bruninho e Davi",
+  "CPM 22",
+  "Clayton e Romário",
+  "Cordel do Fogo Encantado",
+  "Danilo Caymmi",
+  "Dead Fish",
+  "Demônios da Garoa",
+  "Dexter",
+  "Dilsinho",
+  "Duquesa",
+  "Edu Falaschi",
+  "Eskrota",
+  "Eyshila",
+  "Filho do Piseiro",
+  "Filhos da Semente",
+  "Fleezus",
+  "Gaby Amarantos",
+  "Garotos Podres",
+  "Guilherme e Santiago",
+  "Gustavo Mioto",
+  "Hariel",
+  "Hateen",
+  "Inocentes",
+  "Israel e Rodolfo",
+  "Jazz Sabbath",
+  "Jeito Moleque",
+  "Joelma",
+  "Johnny Hooker",
+  "Karol Conká",
+  "Lia de Itamaracá",
+  "Luisa Sonza",
+  "Lydia Lunch",
+  "MV Bill",
+  "Manu Chao",
+  "Marcelo Falcão",
+  "Marcynho Sensação",
+  "Mariana Aydar",
+  "Marina Sena",
+  "Matanza Ritual",
+  "Mato Seco",
+  "Michel Teló",
+  "Mumuzinho",
+  "Mundo Livre S/A",
+  "Munhoz e Mariano",
+  "Odair José",
+  "Onze:20",
+  "Orchestre Poly-Rythmo",
+  "Péricles",
+  "Pixote",
+  "Quelynah",
+  "Raimundos",
+  "Rappin' Hood",
+  "Ratos de Porão",
+  "Roberta Miranda",
+  "Rosa de Saron",
+  "Sambô",
+  "Sarah Farias",
+  "Seu Jorge",
+  "Sidney Magal",
+  "Supla",
+  "The Mississippi Divas",
+  "Thiaguinho",
+  "Titãs",
+  "Tulipa Ruiz",
+  "Turma do Pagode",
+  "Urias",
+  "Vitor Fernandes",
+  "Wanessa",
+  "Zé Geraldo",
+];
+
 const state = {
   events: [],
   filtered: [],
@@ -36,6 +114,8 @@ const el = {
   backToTop: document.querySelector("#backToTop"),
   loadMore: null,
   hidePast: document.querySelector("#hidePast"),
+  nameOnly: document.querySelector("#nameOnly"),
+  artistChips: document.querySelector("#artistChips"),
 };
 
 const PAGE_SIZE = 100;
@@ -88,7 +168,7 @@ function fillTimeSelects() {
     console.warn("timeFrom/timeTo ausentes no HTML");
     return;
   }
-  const stepMinutes = 30; // troque para 15 ou 10 se quiser mais granular
+  const stepMinutes = 30;
   const options = [];
   for (let total = 0; total < 24 * 60; total += stepMinutes) {
     const h = String(Math.floor(total / 60)).padStart(2, "0");
@@ -110,6 +190,7 @@ function fillTimeSelects() {
 function prepareEvents(events) {
   return events.map((event) => ({
     ...event,
+    _searchName: normalize(event.nome),
     _search: normalize(
       [
         event.nome,
@@ -159,7 +240,6 @@ function matchesCurrentFilters(event, skipKey = "") {
     if (from !== null && to !== null && from <= to) {
       if (start < from || start > to) return false;
     } else if (from !== null && to !== null && from > to) {
-      // janela atravessa meia-noite (ex.: 22:00 às 02:00)
       if (start < from && start > to) return false;
     } else if (from !== null && start < from) return false;
     else if (to !== null && start > to) return false;
@@ -169,7 +249,8 @@ function matchesCurrentFilters(event, skipKey = "") {
     if (new Date(event.fim_iso_utc).getTime() < Date.now()) return false;
   }
 
-  return terms.every((term) => event._search.includes(term));
+  const haystack = el.nameOnly.checked ? event._searchName : event._search;
+  return terms.every((term) => haystack.includes(term));
 }
 
 function updateDependentSelects() {
@@ -246,7 +327,6 @@ function eventCard(event) {
           <button class="button ghost favorite-button" type="button" data-action="favorite" aria-pressed="${favorite}">
             ${favorite ? "★ Favorito" : "☆ Favoritar"}
           </button>
-          <button class="button secondary" type="button" data-action="details">Detalhes</button>
           ${officialButton}
         </div>
       </div>
@@ -477,8 +557,35 @@ function importFavoritesJson(file) {
   reader.readAsText(file);
 }
 
+function renderArtistChips() {
+  if (!el.artistChips) return;
+  el.artistChips.innerHTML = FEATURED_ARTISTS
+    .map(
+      (name) =>
+        `<button class="button ghost chip" type="button" data-artist="${escapeHtml(name)}">${escapeHtml(name)}</button>`
+    )
+    .join("");
+  el.artistChips.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-artist]");
+    if (!button) return;
+    // limpa filtros estruturais para garantir que o artista apareça,
+    // mantendo apenas a preferência de esconder eventos passados
+    el.dateFilter.value = "";
+    el.categoryFilter.value = "";
+    el.placeFilter.value = "";
+    el.neighborhoodFilter.value = "";
+    el.timeFrom.value = "";
+    el.timeTo.value = "";
+    el.favoritesOnly.checked = false;
+    el.searchInput.value = button.dataset.artist;
+    el.nameOnly.checked = true;
+    applyFilters();
+    document.querySelector("#eventos")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
 function bindEvents() {
-  const instantInputs = [el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.favoritesOnly, el.timeFrom, el.timeTo, el.hidePast];
+  const instantInputs = [el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.favoritesOnly, el.timeFrom, el.timeTo, el.hidePast, el.nameOnly];
   for (const input of instantInputs) input.addEventListener("input", applyFilters);
   el.searchInput.addEventListener("input", debounce(applyFilters, 200));
 
@@ -492,11 +599,11 @@ function bindEvents() {
     el.timeTo.value = "";
     el.sortOrder.value = "time";
     el.favoritesOnly.checked = false;
+    el.nameOnly.checked = false;
     el.hidePast.checked = true;
     applyFilters();
   });
 
-  // botão voltar ao topo
   el.backToTop.addEventListener("click", () => {
     document.querySelector("#filtersPanel").scrollIntoView({ behavior: "smooth", block: "start" });
   });
@@ -505,13 +612,21 @@ function bindEvents() {
   }, { passive: true });
 
   el.eventList.addEventListener("click", (event) => {
-    const button = event.target.closest("[data-action]");
-    if (!button) return;
-    const card = button.closest("[data-slug]");
+    const actionButton = event.target.closest("[data-action]");
+    const card = event.target.closest("[data-slug]");
     if (!card) return;
     const slug = card.dataset.slug;
-    if (button.dataset.action === "favorite") toggleFavorite(slug);
-    if (button.dataset.action === "details") openDetails(slug);
+
+    if (actionButton) {
+      if (actionButton.dataset.action === "favorite") toggleFavorite(slug);
+      if (actionButton.dataset.action === "details") openDetails(slug);
+      return;
+    }
+
+    // Cliques em links (ex.: botão "Oficial") seguem normalmente
+    if (event.target.closest("a")) return;
+
+    openDetails(slug);
   });
 
   el.dialogContent.addEventListener("click", (event) => {
@@ -522,6 +637,10 @@ function bindEvents() {
   el.dialogContent.addEventListener("input", (event) => {
     const note = event.target.closest("[data-note-for]");
     if (note) updateFavoriteNote(note.dataset.noteFor, note.value);
+  });
+
+  el.dialog.addEventListener("click", (event) => {
+    if (event.target === el.dialog) el.dialog.close();
   });
 
   el.exportVisibleCsv.addEventListener("click", () => {
@@ -584,6 +703,7 @@ async function init() {
   fillSelect(el.placeFilter, uniqueSorted("local"));
   fillSelect(el.neighborhoodFilter, uniqueSorted("bairro"));
   fillTimeSelects();
+  renderArtistChips();
   bindEvents();
   applyFilters();
 }
