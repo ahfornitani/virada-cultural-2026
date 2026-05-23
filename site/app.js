@@ -35,6 +35,7 @@ const el = {
   timeTo: document.querySelector("#timeTo"),
   backToTop: document.querySelector("#backToTop"),
   loadMore: null,
+  hidePast: document.querySelector("#hidePast"),
 };
 
 const PAGE_SIZE = 100;
@@ -162,6 +163,10 @@ function matchesCurrentFilters(event, skipKey = "") {
       if (start < from && start > to) return false;
     } else if (from !== null && start < from) return false;
     else if (to !== null && start > to) return false;
+  }
+
+  if (el.hidePast.checked && event.fim_iso_utc) {
+    if (new Date(event.fim_iso_utc).getTime() < Date.now()) return false;
   }
 
   return terms.every((term) => event._search.includes(term));
@@ -473,7 +478,7 @@ function importFavoritesJson(file) {
 }
 
 function bindEvents() {
-  const instantInputs = [el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.favoritesOnly, el.timeFrom, el.timeTo];
+  const instantInputs = [el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.favoritesOnly, el.timeFrom, el.timeTo, el.hidePast];
   for (const input of instantInputs) input.addEventListener("input", applyFilters);
   el.searchInput.addEventListener("input", debounce(applyFilters, 200));
 
@@ -487,6 +492,7 @@ function bindEvents() {
     el.timeTo.value = "";
     el.sortOrder.value = "time";
     el.favoritesOnly.checked = false;
+    el.hidePast.checked = true;
     applyFilters();
   });
 
@@ -557,6 +563,10 @@ function bindEvents() {
     el.timeTo.value = button.dataset.to;
     applyFilters();
   });
+
+  setInterval(() => {
+    if (el.hidePast.checked) applyFilters();
+  }, 60_000);
 }
 
 async function init() {
