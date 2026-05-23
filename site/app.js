@@ -1,6 +1,14 @@
 const FAVORITES_KEY = "virada-cultural-2026-v3:favorites";
 const collator = new Intl.Collator("pt-BR", { sensitivity: "base", numeric: true });
 
+// helper no topo do arquivo (perto de outros utilitários)
+function isPressed(button) {
+  return button?.getAttribute("aria-pressed") === "true";
+}
+function setPressed(button, value) {
+  button?.setAttribute("aria-pressed", value ? "true" : "false");
+}
+
 const FEATURED_ARTISTS = [
   "Alexandre Pires",
   "Ana Cañas",
@@ -230,7 +238,7 @@ function matchesCurrentFilters(event, skipKey = "") {
   if (el.categoryFilter.value && skipKey !== "categoria" && event.categoria !== el.categoryFilter.value) return false;
   if (el.placeFilter.value && skipKey !== "local" && event.local !== el.placeFilter.value) return false;
   if (el.neighborhoodFilter.value && skipKey !== "bairro" && event.bairro !== el.neighborhoodFilter.value) return false;
-  if (el.favoritesOnly.checked && !state.favorites[event.slug]) return false;
+  if (isPressed(el.favoritesOnly) && !state.favorites[event.slug]) return false;
 
   const from = timeToMinutes(el.timeFrom.value);
   const to = timeToMinutes(el.timeTo.value);
@@ -581,7 +589,7 @@ function renderArtistChips() {
     el.neighborhoodFilter.value = "";
     el.timeFrom.value = "";
     el.timeTo.value = "";
-    el.favoritesOnly.checked = false;
+    setPressed(el.favoritesOnly, false);
     el.searchInput.value = button.dataset.artist;
     el.nameOnly.checked = true;
     applyFilters();
@@ -590,9 +598,16 @@ function renderArtistChips() {
 }
 
 function bindEvents() {
-  const instantInputs = [el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.favoritesOnly, el.timeFrom, el.timeTo, el.hidePast, el.nameOnly];
+  const instantInputs = [el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.timeFrom, el.timeTo, el.hidePast, el.nameOnly];
   for (const input of instantInputs) input.addEventListener("input", applyFilters);
   el.searchInput.addEventListener("input", debounce(applyFilters, 200));
+
+  el.favoritesOnly.addEventListener("click", () => {
+    const next = !isPressed(el.favoritesOnly);
+    setPressed(el.favoritesOnly, next);
+    el.favoritesOnly.textContent = `${next ? "★" : "☆"} Mostrar só favoritos`;
+    applyFilters();
+  });
 
   el.resetFilters.addEventListener("click", () => {
     el.searchInput.value = "";
@@ -606,6 +621,7 @@ function bindEvents() {
     el.favoritesOnly.checked = false;
     el.nameOnly.checked = false;
     el.hidePast.checked = true;
+    setPressed(el.favoritesOnly, false);
     applyFilters();
   });
 

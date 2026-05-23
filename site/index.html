@@ -108,10 +108,6 @@
           Buscar só no nome do evento
         </label>
         <label class="checkbox">
-          <input id="favoritesOnly" type="checkbox" />
-          Mostrar só favoritos
-        </label>
-        <label class="checkbox">
           <input id="hidePast" type="checkbox" checked />
           Esconder eventos que já passaram
         </label>
@@ -135,6 +131,7 @@
         </p>
       </div>
       <div class="export-actions">
+        <button id="favoritesOnly" class="button secondary" type="button" aria-pressed="false">☆ Mostrar só favoritos</button>
         <button id="exportVisibleCsv" class="button secondary" type="button">Salvar CSV filtrado</button>
         <button id="exportFavoritesCsv" class="button secondary" type="button">Salvar CSV favoritos</button>
         <button id="exportFavoritesIcs" class="button secondary" type="button">Salvar calendário .ics</button>
