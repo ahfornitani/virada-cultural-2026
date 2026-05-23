@@ -217,7 +217,10 @@ function imageHtml(event) {
 
 function eventCard(event) {
   const favorite = Boolean(state.favorites[event.slug]);
-  const description = event.descricao ? `${event.descricao.slice(0, 150)}${event.descricao.length > 150 ? "..." : ""}` : "";
+  const rawDescription = (event.descricao || "").replace(/^https?:\/\/\S+\s*/i, "").trim();
+  const description = rawDescription
+    ? `${rawDescription.slice(0, 150)}${rawDescription.length > 150 ? "..." : ""}`
+    : "";
   const url = eventUrl(event);
   const officialButton = url
     ? `<a class="button secondary" href="${escapeHtml(url)}" target="_blank" rel="noopener">Oficial</a>`
@@ -488,7 +491,9 @@ function bindEvents() {
   });
 
   // botão voltar ao topo
-  el.backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  el.backToTop.addEventListener("click", () => {
+    document.querySelector("#filtersPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   window.addEventListener("scroll", () => {
     el.backToTop.classList.toggle("visible", window.scrollY > 400);
   }, { passive: true });

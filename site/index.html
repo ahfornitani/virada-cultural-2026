@@ -50,7 +50,7 @@
       </article>
     </section>
 
-    <section class="panel" aria-labelledby="filtersTitle">
+    <section class="panel" id="filtersPanel" aria-labelledby="filtersTitle">
       <div class="panel-heading">
         <div>
           <p class="eyebrow">Filtros</p>
@@ -65,27 +65,19 @@
         </label>
         <label>
           Data
-          <select id="dateFilter">
-            <option value="">Todas</option>
-          </select>
+          <select id="dateFilter"><option value="">Todas</option></select>
         </label>
         <label>
           Categoria
-          <select id="categoryFilter">
-            <option value="">Todas</option>
-          </select>
+          <select id="categoryFilter"><option value="">Todas</option></select>
         </label>
         <label>
           Palco/local
-          <select id="placeFilter">
-            <option value="">Todos</option>
-          </select>
+          <select id="placeFilter"><option value="">Todos</option></select>
         </label>
         <label>
           Bairro
-          <select id="neighborhoodFilter">
-            <option value="">Todos</option>
-          </select>
+          <select id="neighborhoodFilter"><option value="">Todos</option></select>
         </label>
         <label>
           Ordenar
@@ -96,13 +88,7 @@
             <option value="neighborhood">Bairro</option>
           </select>
         </label>
-        <div class="time-presets" role="group" aria-label="Períodos do dia">
-          <button class="button ghost" type="button" data-from="06:00" data-to="12:00">Manhã</button>
-          <button class="button ghost" type="button" data-from="12:00" data-to="18:00">Tarde</button>
-          <button class="button ghost" type="button" data-from="18:00" data-to="23:30">Noite</button>
-          <button class="button ghost" type="button" data-from="00:00" data-to="06:00">Madrugada</button>
-        </div>
-                <label>
+        <label>
           Horário de
           <select id="timeFrom"><option value="">Início</option></select>
         </label>
@@ -114,6 +100,13 @@
           <input id="favoritesOnly" type="checkbox" />
           Só favoritos
         </label>
+      </div>
+
+      <div class="time-presets" role="group" aria-label="Períodos do dia">
+        <button class="button ghost" type="button" data-from="06:00" data-to="12:00">Manhã</button>
+        <button class="button ghost" type="button" data-from="12:00" data-to="18:00">Tarde</button>
+        <button class="button ghost" type="button" data-from="18:00" data-to="23:30">Noite</button>
+        <button class="button ghost" type="button" data-from="00:00" data-to="06:00">Madrugada</button>
       </div>
     </section>
 
