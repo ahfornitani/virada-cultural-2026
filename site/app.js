@@ -207,7 +207,7 @@ function renderStats() {
   el.totalEvents.textContent = state.events.length.toLocaleString("pt-BR");
   el.visibleEvents.textContent = state.filtered.length.toLocaleString("pt-BR");
   el.favoriteEvents.textContent = favoriteRows().length.toLocaleString("pt-BR");
-  el.activeDates.textContent = new Set(state.events.map((event) => event.data_inicio)).size;
+  el.activeDates.textContent = new Set(state.filtered.map((event) => event.data_inicio)).size;
 }
 
 function imageHtml(event) {
