@@ -43,7 +43,7 @@ function normalize(text) {
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => {
-    const entities = { "&": "&", "<": "<", ">": ">", '"': """, "'": "'" };
+    const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
     return entities[char];
   });
 }
