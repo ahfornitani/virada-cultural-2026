@@ -1,146 +1,150 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Virada Cultural 2026 — agenda pesquisável</title>
-    <meta
-      name="description"
-      content="Agenda pesquisável da Virada Cultural 2026 com filtros, favoritos, exportação CSV/JSON/ICS e dados estáticos."
-    />
-    <link rel="stylesheet" href="styles.css" />
-    <script src="app.js" defer></script>
-  </head>
-  <body>
-    <header class="hero">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Virada Cultural 2026 — agenda pesquisável</title>
+  <meta name="description"
+    content="Agenda pesquisável da Virada Cultural 2026 com filtros, favoritos, exportação CSV/JSON/ICS e dados estáticos." />
+  <link rel="stylesheet" href="styles.css" />
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Virada Cultural 2026</p>
+      <p class="subtitle">
+        Um site estático e rápido para pesquisar a programação, montar sua lista e baixar CSV,
+        JSON ou calendário.
+      </p>
+      <p>
+        <em>Confira os horários no site oficial!</em>
+      </p>
+    </div>
+    <div class="hero-actions">
+      <a class="button secondary" href="data/virada_cultural_2026_v3.csv" download>Salvar CSV com todos os eventos</a>
+      <a class="button secondary" href="data/events.json" download>Salvar JSON com todos os eventos</a>
+      <a class="button primary" href="#eventos">Ver eventos</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="stats" aria-label="Resumo">
+      <article>
+        <strong id="totalEvents">988</strong>
+        <span>eventos</span>
+      </article>
+      <article>
+        <strong id="visibleEvents">0</strong>
+        <span>visíveis</span>
+      </article>
+      <article>
+        <strong id="favoriteEvents">0</strong>
+        <span>favoritos</span>
+      </article>
+      <article>
+        <strong id="activeDates">0</strong>
+        <span>datas</span>
+      </article>
+    </section>
+
+    <section class="panel" aria-labelledby="filtersTitle">
+      <div class="panel-heading">
+        <div>
+          <p class="eyebrow">Filtros</p>
+        </div>
+        <button id="resetFilters" class="button ghost" type="button">Limpar filtros</button>
+      </div>
+
+      <div class="filters">
+        <label class="wide">
+          Busca livre
+          <input id="searchInput" type="search" placeholder="Artista, bairro, palco, descrição..." autocomplete="off" />
+        </label>
+        <label>
+          Data
+          <select id="dateFilter">
+            <option value="">Todas</option>
+          </select>
+        </label>
+        <label>
+          Categoria
+          <select id="categoryFilter">
+            <option value="">Todas</option>
+          </select>
+        </label>
+        <label>
+          Palco/local
+          <select id="placeFilter">
+            <option value="">Todos</option>
+          </select>
+        </label>
+        <label>
+          Bairro
+          <select id="neighborhoodFilter">
+            <option value="">Todos</option>
+          </select>
+        </label>
+        <label>
+          Ordenar
+          <select id="sortOrder">
+            <option value="time">Horário</option>
+            <option value="name">Nome</option>
+            <option value="category">Categoria</option>
+            <option value="neighborhood">Bairro</option>
+          </select>
+        </label>
+        <label class="checkbox">
+          <input id="favoritesOnly" type="checkbox" />
+          Só favoritos
+        </label>
+      </div>
+    </section>
+
+    <section class="panel export-panel" aria-labelledby="exportTitle">
       <div>
-        <p class="eyebrow">Virada Cultural 2026</p>
-        <h1>Encontre, salve e exporte seus eventos favoritos</h1>
-        <p class="subtitle">
-          Um site estático e rápido para pesquisar a programação, montar sua lista e baixar CSV,
-          JSON ou calendário.
+        <p class="eyebrow">Minha lista</p>
+        <h2 id="exportTitle">Favoritos, notas e exportações</h2>
+        <p>
+          Os favoritos e notas ficam salvos apenas neste navegador (<code>localStorage</code>). Para usar em outro
+          navegador ou
+          dispositivo, use o botão "Salvar lista JSON" neste navegador, e use o botão "Importar lista JSON" no outro
+          navegador. Assim, você manterá seus favoritas e notas.
         </p>
       </div>
-      <div class="hero-actions">
-        <a class="button secondary" href="data/virada_cultural_2026_v3.csv" download>Baixar CSV completo</a>
-        <a class="button secondary" href="data/events.json" download>Baixar JSON completo</a>
-        <a class="button primary" href="#eventos">Ver eventos</a>
+      <div class="export-actions">
+        <button id="exportVisibleCsv" class="button secondary" type="button">Salvar CSV filtrado</button>
+        <button id="exportFavoritesCsv" class="button secondary" type="button">Salvar CSV favoritos</button>
+        <button id="exportFavoritesIcs" class="button secondary" type="button">Salvar calendário .ics</button>
+        <button id="exportFavoritesJson" class="button secondary" type="button">Salvar lista JSON</button>
+        <label class="button secondary file-button">
+          Importar lista JSON
+          <input id="importFavoritesJson" type="file" accept="application/json,.json" />
+        </label>
+        <button id="clearFavorites" class="button danger" type="button">Limpar favoritos</button>
       </div>
-    </header>
+    </section>
 
-    <main>
-      <section class="stats" aria-label="Resumo">
-        <article>
-          <strong id="totalEvents">988</strong>
-          <span>eventos</span>
-        </article>
-        <article>
-          <strong id="visibleEvents">0</strong>
-          <span>visíveis</span>
-        </article>
-        <article>
-          <strong id="favoriteEvents">0</strong>
-          <span>favoritos</span>
-        </article>
-        <article>
-          <strong id="activeDates">0</strong>
-          <span>datas</span>
-        </article>
-      </section>
+    <p id="status" class="status" role="status" aria-live="polite">Carregando dados...</p>
 
-      <section class="panel" aria-labelledby="filtersTitle">
-        <div class="panel-heading">
-          <div>
-            <p class="eyebrow">Filtros</p>
-            <h2 id="filtersTitle">Pesquise a programação</h2>
-          </div>
-          <button id="resetFilters" class="button ghost" type="button">Limpar filtros</button>
-        </div>
+    <section id="eventos" class="event-list" aria-label="Eventos"></section>
+  </main>
 
-        <div class="filters">
-          <label class="wide">
-            Busca livre
-            <input id="searchInput" type="search" placeholder="Artista, bairro, palco, descrição..." autocomplete="off" />
-          </label>
-          <label>
-            Data
-            <select id="dateFilter">
-              <option value="">Todas</option>
-            </select>
-          </label>
-          <label>
-            Categoria
-            <select id="categoryFilter">
-              <option value="">Todas</option>
-            </select>
-          </label>
-          <label>
-            Palco/local
-            <select id="placeFilter">
-              <option value="">Todos</option>
-            </select>
-          </label>
-          <label>
-            Bairro
-            <select id="neighborhoodFilter">
-              <option value="">Todos</option>
-            </select>
-          </label>
-          <label>
-            Ordenar
-            <select id="sortOrder">
-              <option value="time">Horário</option>
-              <option value="name">Nome</option>
-              <option value="category">Categoria</option>
-              <option value="neighborhood">Bairro</option>
-            </select>
-          </label>
-          <label class="checkbox">
-            <input id="favoritesOnly" type="checkbox" />
-            Só favoritos
-          </label>
-        </div>
-      </section>
+  <dialog id="eventDialog">
+    <form method="dialog">
+      <button class="dialog-close" aria-label="Fechar">×</button>
+    </form>
+    <div id="dialogContent"></div>
+  </dialog>
 
-      <section class="panel export-panel" aria-labelledby="exportTitle">
-        <div>
-          <p class="eyebrow">Minha lista</p>
-          <h2 id="exportTitle">Favoritos, notas e exportações</h2>
-          <p>
-            Os favoritos e notas ficam no <code>localStorage</code> deste navegador. Exporte um JSON
-            para guardar a lista e importar depois.
-          </p>
-        </div>
-        <div class="export-actions">
-          <button id="exportVisibleCsv" class="button secondary" type="button">CSV filtrado</button>
-          <button id="exportFavoritesCsv" class="button secondary" type="button">CSV favoritos</button>
-          <button id="exportFavoritesIcs" class="button secondary" type="button">Calendário .ics</button>
-          <button id="exportFavoritesJson" class="button secondary" type="button">Salvar lista JSON</button>
-          <label class="button secondary file-button">
-            Importar lista JSON
-            <input id="importFavoritesJson" type="file" accept="application/json,.json" />
-          </label>
-          <button id="clearFavorites" class="button danger" type="button">Limpar favoritos</button>
-        </div>
-      </section>
+  <footer>
+    <p>
+      Dados extraídos de <a href="https://viradasp.prefeitura.sp.gov.br/">viradasp.prefeitura.sp.gov.br</a>.
+      Este é um front-end estático feito para pesquisa, exportação e uso pessoal da programação.
+    </p>
+  </footer>
+</body>
 
-      <p id="status" class="status" role="status" aria-live="polite">Carregando dados...</p>
-
-      <section id="eventos" class="event-list" aria-label="Eventos"></section>
-    </main>
-
-    <dialog id="eventDialog">
-      <form method="dialog">
-        <button class="dialog-close" aria-label="Fechar">×</button>
-      </form>
-      <div id="dialogContent"></div>
-    </dialog>
-
-    <footer>
-      <p>
-        Dados extraídos de <a href="https://viradasp.prefeitura.sp.gov.br/">viradasp.prefeitura.sp.gov.br</a>.
-        Este é um front-end estático feito para pesquisa, exportação e uso pessoal da programação.
-      </p>
-    </footer>
-  </body>
 </html>
