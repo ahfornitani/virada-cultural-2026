@@ -43,7 +43,7 @@ function normalize(text) {
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => {
-    const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    const entities = { "&": "&", "<": "<", ">": ">", '"': """, "'": "'" };
     return entities[char];
   });
 }
@@ -166,6 +166,10 @@ function imageHtml(event) {
 function eventCard(event) {
   const favorite = Boolean(state.favorites[event.slug]);
   const description = event.descricao ? `${event.descricao.slice(0, 150)}${event.descricao.length > 150 ? "..." : ""}` : "";
+  const url = eventUrl(event);
+  const officialButton = url
+    ? `<a class="button secondary" href="${escapeHtml(url)}" target="_blank" rel="noopener">Oficial</a>`
+    : `<span class="pill" title="Slug inválido na fonte oficial — sem página individual disponível">Sem página oficial</span>`;
   return `
     <article class="event-card" data-slug="${escapeHtml(event.slug)}">
       ${imageHtml(event)}
@@ -183,7 +187,7 @@ function eventCard(event) {
             ${favorite ? "★ Favorito" : "☆ Favoritar"}
           </button>
           <button class="button secondary" type="button" data-action="details">Detalhes</button>
-          <a class="button secondary" href="${escapeHtml(eventUrl(event))}" target="_blank" rel="noopener">Oficial</a>
+          ${officialButton}
         </div>
       </div>
     </article>
@@ -230,6 +234,10 @@ function openDetails(slug) {
   if (!event) return;
   const favorite = Boolean(state.favorites[event.slug]);
   const note = state.favorites[event.slug]?.note || "";
+  const url = eventUrl(event);
+  const officialLink = url
+    ? `<a class="button secondary" href="${escapeHtml(url)}" target="_blank" rel="noopener">Abrir no site oficial</a>`
+    : `<span class="pill" title="Slug inválido na fonte oficial">Sem página oficial disponível</span>`;
   el.dialogContent.innerHTML = `
     <div class="dialog-body">
       ${imageHtml(event)}
@@ -246,7 +254,7 @@ function openDetails(slug) {
         <button class="button ghost favorite-button" type="button" data-dialog-favorite="${escapeHtml(event.slug)}" aria-pressed="${favorite}">
           ${favorite ? "★ Favorito" : "☆ Favoritar"}
         </button>
-        <a class="button secondary" href="${escapeHtml(eventUrl(event))}" target="_blank" rel="noopener">Abrir no site oficial</a>
+        ${officialLink}
       </div>
       <label class="note-box">
         Nota pessoal para este evento

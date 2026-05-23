@@ -212,6 +212,9 @@ def local_to_string(value: Any) -> str:
     return str(value)
 
 
+import re as _re
+_SAFE_SLUG = _re.compile(r"^[a-z0-9\-]+$")
+
 def event_to_row(entry: dict[str, Any], parties: list[dict[str, Any]]) -> dict[str, Any]:
     fields = entry.get("fields", {})
     if not isinstance(fields, dict):
@@ -220,6 +223,11 @@ def event_to_row(entry: dict[str, Any], parties: list[dict[str, Any]]) -> dict[s
     slug = str(fields.get("slug", "")).strip()
     if not slug:
         raise RuntimeError("Event entry without slug.")
+
+    slug_ok = bool(_SAFE_SLUG.match(slug))
+    official_url = f"{SOURCE_URL.rstrip('/')}/evento/{slug}/detalhes" if slug_ok else ""
+    if not slug_ok:
+        print(f"  ! slug inválido (sem URL oficial): {slug!r}")
 
     start_original = str(fields.get("startDate", ""))
     end_original = str(fields.get("endDate", ""))
@@ -245,8 +253,8 @@ def event_to_row(entry: dict[str, Any], parties: list[dict[str, Any]]) -> dict[s
         "longitude": location.get("lon", ""),
         "instagram": str(fields.get("instagramLink", "")),
         "playlist": str(fields.get("playlistLink", "")),
-        "url": f"{SOURCE_URL.rstrip('/')}/evento/{slug}/detalhes",
-        "url_oficial": f"{SOURCE_URL.rstrip('/')}/evento/{slug}/detalhes",
+        "url": official_url,
+        "url_oficial": official_url,
         "foto": first_photo_url(fields, parties),
         "descricao": rich_text_to_plain(fields.get("description", {})),
         "inicio_iso_utc": start_utc,
