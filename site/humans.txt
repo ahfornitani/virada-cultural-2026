@@ -1,0 +1,14 @@
+/* TEAM */
+Ideação: Augusto Fornitani
+Feedback: Priscila Fornitani, Tharcísio Nogueira
+Código: 1% Augusto Fornitani, 99% Claude Opus 4.7
+
+/* THANKS */
+Organizadores da Virada Cultural de São Paulo
+Equipe do site oficial: https://viradasp.prefeitura.sp.gov.br/
+
+/* SITE */
+Repositório: https://github.com/ahfornitani/virada-cultural-2026
+Hospedagem: Netlify
+Stack: HTML + CSS + JavaScript estáticos; scraper em Python
+Padrão: humans.txt (https://humanstxt.org/)
