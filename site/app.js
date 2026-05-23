@@ -246,7 +246,12 @@ function matchesCurrentFilters(event, skipKey = "") {
   }
 
   if (el.hidePast.checked && event.fim_iso_utc) {
-    if (new Date(event.fim_iso_utc).getTime() < Date.now()) return false;
+    const endMs = new Date(event.fim_iso_utc).getTime();
+    const startMs = event.inicio_iso_utc ? new Date(event.inicio_iso_utc).getTime() : null;
+    // Se o fim é igual ou anterior ao início (ex.: termina 00:00 do mesmo dia),
+    // o evento atravessa a meia-noite: soma 24h ao fim antes de comparar.
+    const adjustedEnd = startMs !== null && endMs <= startMs ? endMs + 24 * 60 * 60 * 1000 : endMs;
+    if (adjustedEnd < Date.now()) return false;
   }
 
   const haystack = el.nameOnly.checked ? event._searchName : event._search;
