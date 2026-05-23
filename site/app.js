@@ -31,7 +31,14 @@ const el = {
   clearFavorites: document.querySelector("#clearFavorites"),
   dialog: document.querySelector("#eventDialog"),
   dialogContent: document.querySelector("#dialogContent"),
+  timeFrom: document.querySelector("#timeFrom"),
+  timeTo: document.querySelector("#timeTo"),
+  backToTop: document.querySelector("#backToTop"),
+  loadMore: null,
 };
+
+const PAGE_SIZE = 100;
+let renderedCount = 0;
 
 function normalize(text) {
   return String(text || "")
@@ -75,6 +82,30 @@ function fillSelect(select, values, selectedValue = select.value) {
   select.value = values.includes(selectedValue) ? selectedValue : "";
 }
 
+function fillTimeSelects() {
+  if (!el.timeFrom || !el.timeTo) {
+    console.warn("timeFrom/timeTo ausentes no HTML");
+    return;
+  }
+  const stepMinutes = 30; // troque para 15 ou 10 se quiser mais granular
+  const options = [];
+  for (let total = 0; total < 24 * 60; total += stepMinutes) {
+    const h = String(Math.floor(total / 60)).padStart(2, "0");
+    const m = String(total % 60).padStart(2, "0");
+    options.push(`${h}:${m}`);
+  }
+  for (const select of [el.timeFrom, el.timeTo]) {
+    const placeholder = select.options[0];
+    select.replaceChildren(placeholder);
+    for (const value of options) {
+      const opt = document.createElement("option");
+      opt.value = value;
+      opt.textContent = value;
+      select.append(opt);
+    }
+  }
+}
+
 function prepareEvents(events) {
   return events.map((event) => ({
     ...event,
@@ -104,6 +135,12 @@ function eventUrl(event) {
   return event.url_oficial || event.url || "";
 }
 
+function timeToMinutes(t) {
+  if (!t) return null;
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+}
+
 function matchesCurrentFilters(event, skipKey = "") {
   const query = normalize(el.searchInput.value);
   const terms = query ? query.split(/\s+/) : [];
@@ -112,6 +149,21 @@ function matchesCurrentFilters(event, skipKey = "") {
   if (el.placeFilter.value && skipKey !== "local" && event.local !== el.placeFilter.value) return false;
   if (el.neighborhoodFilter.value && skipKey !== "bairro" && event.bairro !== el.neighborhoodFilter.value) return false;
   if (el.favoritesOnly.checked && !state.favorites[event.slug]) return false;
+
+  const from = timeToMinutes(el.timeFrom.value);
+  const to = timeToMinutes(el.timeTo.value);
+  if (from !== null || to !== null) {
+    const start = timeToMinutes(event.hora_inicio);
+    if (start === null) return false;
+    if (from !== null && to !== null && from <= to) {
+      if (start < from || start > to) return false;
+    } else if (from !== null && to !== null && from > to) {
+      // janela atravessa meia-noite (ex.: 22:00 às 02:00)
+      if (start < from && start > to) return false;
+    } else if (from !== null && start < from) return false;
+    else if (to !== null && start > to) return false;
+  }
+
   return terms.every((term) => event._search.includes(term));
 }
 
@@ -203,7 +255,39 @@ function render() {
     return;
   }
 
-  el.eventList.innerHTML = state.filtered.map(eventCard).join("");
+  renderedCount = Math.min(PAGE_SIZE, state.filtered.length);
+  el.eventList.innerHTML = state.filtered.slice(0, renderedCount).map(eventCard).join("");
+  renderLoadMore();
+}
+
+function renderLoadMore() {
+  const existing = document.querySelector("#loadMore");
+  if (existing) existing.remove();
+  if (renderedCount >= state.filtered.length) return;
+  const remaining = state.filtered.length - renderedCount;
+  const button = document.createElement("button");
+  button.id = "loadMore";
+  button.className = "button secondary";
+  button.type = "button";
+  button.textContent = `Carregar mais (${remaining} restantes)`;
+  button.style.margin = "1rem auto";
+  button.style.display = "block";
+  button.addEventListener("click", () => {
+    const next = Math.min(renderedCount + PAGE_SIZE, state.filtered.length);
+    const slice = state.filtered.slice(renderedCount, next);
+    el.eventList.insertAdjacentHTML("beforeend", slice.map(eventCard).join(""));
+    renderedCount = next;
+    renderLoadMore();
+  });
+  el.eventList.after(button);
+}
+
+function debounce(fn, ms) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), ms);
+  };
 }
 
 function favoriteRows() {
@@ -386,8 +470,9 @@ function importFavoritesJson(file) {
 }
 
 function bindEvents() {
-  const filterInputs = [el.searchInput, el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.favoritesOnly];
-  for (const input of filterInputs) input.addEventListener("input", applyFilters);
+  const instantInputs = [el.dateFilter, el.categoryFilter, el.placeFilter, el.neighborhoodFilter, el.sortOrder, el.favoritesOnly, el.timeFrom, el.timeTo];
+  for (const input of instantInputs) input.addEventListener("input", applyFilters);
+  el.searchInput.addEventListener("input", debounce(applyFilters, 200));
 
   el.resetFilters.addEventListener("click", () => {
     el.searchInput.value = "";
@@ -395,10 +480,18 @@ function bindEvents() {
     el.categoryFilter.value = "";
     el.placeFilter.value = "";
     el.neighborhoodFilter.value = "";
+    el.timeFrom.value = "";
+    el.timeTo.value = "";
     el.sortOrder.value = "time";
     el.favoritesOnly.checked = false;
     applyFilters();
   });
+
+  // botão voltar ao topo
+  el.backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+  window.addEventListener("scroll", () => {
+    el.backToTop.classList.toggle("visible", window.scrollY > 400);
+  }, { passive: true });
 
   el.eventList.addEventListener("click", (event) => {
     const button = event.target.closest("[data-action]");
@@ -451,6 +544,14 @@ function bindEvents() {
     saveFavorites();
     applyFilters();
   });
+
+  document.querySelector(".time-presets")?.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-from]");
+    if (!button) return;
+    el.timeFrom.value = button.dataset.from;
+    el.timeTo.value = button.dataset.to;
+    applyFilters();
+  });
 }
 
 async function init() {
@@ -467,6 +568,7 @@ async function init() {
   fillSelect(el.categoryFilter, uniqueSorted("categoria"));
   fillSelect(el.placeFilter, uniqueSorted("local"));
   fillSelect(el.neighborhoodFilter, uniqueSorted("bairro"));
+  fillTimeSelects();
   bindEvents();
   applyFilters();
 }

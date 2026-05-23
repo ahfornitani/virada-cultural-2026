@@ -96,6 +96,20 @@
             <option value="neighborhood">Bairro</option>
           </select>
         </label>
+        <div class="time-presets">
+          <button type="button" data-from="06:00" data-to="12:00">Manhã</button>
+          <button type="button" data-from="12:00" data-to="18:00">Tarde</button>
+          <button type="button" data-from="18:00" data-to="23:30">Noite</button>
+          <button type="button" data-from="00:00" data-to="06:00">Madrugada</button>
+        </div>
+                <label>
+          Horário de
+          <select id="timeFrom"><option value="">Início</option></select>
+        </label>
+        <label>
+          até
+          <select id="timeTo"><option value="">Fim</option></select>
+        </label>
         <label class="checkbox">
           <input id="favoritesOnly" type="checkbox" />
           Só favoritos
@@ -111,7 +125,7 @@
           Os favoritos e notas ficam salvos apenas neste navegador (<code>localStorage</code>). Para usar em outro
           navegador ou
           dispositivo, use o botão "Salvar lista JSON" neste navegador, e use o botão "Importar lista JSON" no outro
-          navegador. Assim, você manterá seus favoritas e notas.
+          navegador. Assim, você manterá seus favoritos e notas.
         </p>
       </div>
       <div class="export-actions">
@@ -131,6 +145,8 @@
 
     <section id="eventos" class="event-list" aria-label="Eventos"></section>
   </main>
+
+  <button id="backToTop" class="button primary back-to-top" type="button" aria-label="Voltar aos filtros">↑ Topo</button>
 
   <dialog id="eventDialog">
     <form method="dialog">
