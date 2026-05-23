@@ -157,12 +157,9 @@ def display_datetime_from_source(iso_value: str) -> tuple[str, str, str]:
         return "", "", ""
 
     source_dt = datetime.fromisoformat(iso_value)
-    # Hora local de São Paulo (UTC-3) para exibição — bate com o site oficial
     local_dt = normalize_event_year(source_dt.astimezone(SAO_PAULO_TZ).replace(microsecond=0))
-    displayed_dt = local_dt.replace(minute=0, second=0, microsecond=0)
-    # ISO em UTC para o .ics (calendários precisam de UTC ou TZ explícita)
-    iso_utc = displayed_dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
-    return displayed_dt.strftime("%d/%m/%Y"), displayed_dt.strftime("%H:%M"), iso_utc
+    iso_utc = local_dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    return local_dt.strftime("%d/%m/%Y"), local_dt.strftime("%H:%M"), iso_utc
 
 
 def resolve_rsc_ref(value: Any, parties: list[dict[str, Any]]) -> Any:
@@ -297,7 +294,7 @@ def build_metadata(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
         "event_count": len(rows),
         "expected_event_count": EXPECTED_EVENT_COUNT,
-        "time_normalization": "Raw ISO timestamps are converted to UTC clock time and displayed as full hours to match the official detail pages (for example, 00h => 00:00). Three 2025 source dates are normalized to 2026 for the Virada Cultural 2026 agenda.",
+        "time_normalization": "Timestamps ISO da fonte são convertidos para o horário local de São Paulo (UTC-3) preservando os minutos. Três datas com ano 2025 na fonte são normalizadas para 2026.",
         "counts": {
             "by_category": dict(sorted(by_category.items())),
             "by_date": dict(sorted(by_date.items())),

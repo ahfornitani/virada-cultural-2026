@@ -45,6 +45,16 @@ def official_times_for(html: str, slug: str) -> tuple[str | None, str | None]:
     return None, None
 
 
+from datetime import timezone, timedelta
+SP_TZ = timezone(timedelta(hours=-3))
+
+def expected_display(iso: str) -> tuple[str, str]:
+    dt = datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(SP_TZ)
+    if dt.year == 2025:
+        dt = dt.replace(year=2026)
+    return dt.strftime("%d/%m/%Y"), dt.strftime("%H:%M")
+
+
 def check_one(ev: dict) -> dict:
     slug = ev["slug"]
     url = f"{SOURCE}/evento/{slug}/detalhes"
@@ -57,22 +67,31 @@ def check_one(ev: dict) -> dict:
         return result
 
     official_start, official_end = official_times_for(html, slug)
-    local_start = ev.get("inicio_iso_original")
-    local_end = ev.get("fim_iso_original")
-
     if not official_start:
         result["status"] = "NAO_ENCONTRADO"
         return result
 
-    same = (
-        to_instant(official_start) == to_instant(local_start)
-        and to_instant(official_end) == to_instant(local_end)
+    # compara instante absoluto
+    same_instant = (
+        to_instant(official_start) == to_instant(ev.get("inicio_iso_original"))
+        and to_instant(official_end) == to_instant(ev.get("fim_iso_original"))
     )
-    if not same:
+    # compara o que está EXIBIDO no nosso site com o que deveria ser exibido (derivado do oficial)
+    exp_date, exp_time = expected_display(official_start)
+    exp_date_end, exp_time_end = expected_display(official_end)
+    same_display = (
+        ev["data_inicio"] == exp_date
+        and ev["hora_inicio"] == exp_time
+        and ev["data_fim"] == exp_date_end
+        and ev["hora_fim"] == exp_time_end
+    )
+
+    if not (same_instant and same_display):
         result["status"] = "DIFERENTE"
-        result["site_oficial"] = {"start": official_start, "end": official_end}
-        result["meu_json"] = {"start": local_start, "end": local_end}
-        result["exibido_no_site_estatico"] = f'{ev["data_inicio"]} {ev["hora_inicio"]}–{ev["hora_fim"]}'
+        result["site_oficial_iso"] = {"start": official_start, "end": official_end}
+        result["meu_json_iso"] = {"start": ev.get("inicio_iso_original"), "end": ev.get("fim_iso_original")}
+        result["exibido_no_meu_site"] = f'{ev["data_inicio"]} {ev["hora_inicio"]}–{ev["hora_fim"]}'
+        result["deveria_exibir"] = f'{exp_date} {exp_time}–{exp_time_end}'
     return result
 
 
