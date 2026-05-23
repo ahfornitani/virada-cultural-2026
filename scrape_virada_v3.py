@@ -18,7 +18,7 @@ import re
 import shutil
 import urllib.request
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -150,14 +150,18 @@ def normalize_event_year(dt: datetime) -> datetime:
     return dt
 
 
+SAO_PAULO_TZ = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
+
 def display_datetime_from_source(iso_value: str) -> tuple[str, str, str]:
     if not iso_value:
         return "", "", ""
 
     source_dt = datetime.fromisoformat(iso_value)
-    precise_utc = normalize_event_year(source_dt.astimezone(timezone.utc).replace(microsecond=0))
-    displayed_dt = precise_utc.replace(minute=0, second=0, microsecond=0)
-    iso_utc = precise_utc.isoformat().replace("+00:00", "Z")
+    # Hora local de São Paulo (UTC-3) para exibição — bate com o site oficial
+    local_dt = normalize_event_year(source_dt.astimezone(SAO_PAULO_TZ).replace(microsecond=0))
+    displayed_dt = local_dt.replace(minute=0, second=0, microsecond=0)
+    # ISO em UTC para o .ics (calendários precisam de UTC ou TZ explícita)
+    iso_utc = displayed_dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
     return displayed_dt.strftime("%d/%m/%Y"), displayed_dt.strftime("%H:%M"), iso_utc
 
 
@@ -261,8 +265,8 @@ def validate_rows(rows: list[dict[str, Any]], raw_count: int) -> None:
 
     by_slug = {row["slug"]: row for row in rows}
     expected_samples = {
-        "nos-tempos-da-soweto-871e": ("24/05/2026", "22:00"),
-        "duo-entre-cordas": ("24/05/2026", "12:00"),
+        "nos-tempos-da-soweto-871e": ("24/05/2026", "19:00"),
+        "duo-entre-cordas": ("24/05/2026", "09:00"),
     }
     for slug, (expected_date, expected_time) in expected_samples.items():
         row = by_slug.get(slug)

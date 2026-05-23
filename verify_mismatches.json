@@ -1,0 +1,119 @@
+[
+  {
+    "slug": "cunhado-de-lobisomem-com-paulo-freire-e-danilo-moraes-053b",
+    "nome": "Cunhado de Lobisomem. Com Paulo Freire e Danilo Moraes",
+    "site_oficial": {
+      "start": "2026-05-23T20:00:00-03:00",
+      "end": "2026-05-23T21:00:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-23T18:30:00-03:00",
+      "end": "2026-05-23T19:30:00-03:00"
+    },
+    "exibido_no_site_estatico": "23/05/2026 18:00–19:00"
+  },
+  {
+    "slug": "mascotinhos-costurando-criaturas-de-bolso-adae",
+    "nome": "Mascotinhos - costurando criaturas de bolso",
+    "site_oficial": {
+      "start": "2026-05-23T21:30:00-03:00",
+      "end": "2026-05-23T22:30:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-24T15:30:00-03:00",
+      "end": "2026-05-24T16:30:00-03:00"
+    },
+    "exibido_no_site_estatico": "24/05/2026 15:00–16:00"
+  },
+  {
+    "slug": "patifaria-popular-bc88",
+    "nome": "Patifaria Popular",
+    "site_oficial": {
+      "start": "2026-05-24T15:00:00-03:00",
+      "end": "2026-05-24T16:00:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-23T20:00:00-03:00",
+      "end": "2026-05-23T21:00:00-03:00"
+    },
+    "exibido_no_site_estatico": "23/05/2026 20:00–21:00"
+  },
+  {
+    "slug": "cia-atelie-do-gesto-0dac",
+    "nome": "Cia Ateliê do Gesto",
+    "site_oficial": {
+      "start": "2026-05-24T00:00:00-03:00",
+      "end": "2026-05-24T01:00:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-23T23:00-03:00",
+      "end": "2026-05-23T23:30-03:00"
+    },
+    "exibido_no_site_estatico": "23/05/2026 23:00–23:00"
+  },
+  {
+    "slug": "teatro-baile-conta-missa-do-vaqueiro-f8fa",
+    "nome": "Teatro-baile conta Missa do Vaqueiro",
+    "site_oficial": {
+      "start": "2026-05-23T16:00:00-03:00",
+      "end": "2026-05-23T17:00:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-23T20:00:00-03:00",
+      "end": "2026-05-23T21:00:00-03:00"
+    },
+    "exibido_no_site_estatico": "23/05/2026 20:00–21:00"
+  },
+  {
+    "slug": "meditacao-mantrica-pela-paz-f5b1",
+    "nome": "Meditação Mântrica pela Paz",
+    "site_oficial": {
+      "start": "2026-05-23T15:00:00-03:00",
+      "end": "2026-05-23T17:00:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-23T11:30:00-03:00",
+      "end": "2026-05-23T12:30:00-03:00"
+    },
+    "exibido_no_site_estatico": "23/05/2026 11:00–12:00"
+  },
+  {
+    "slug": "eulalia-a-segunda-depositante-2aa5",
+    "nome": "Eulália: A Segunda Depositante",
+    "site_oficial": {
+      "start": "2026-05-23T09:00:00-03:00",
+      "end": "2026-05-23T10:00:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-24T14:00:00-03:00",
+      "end": "2026-05-24T15:00:00-03:00"
+    },
+    "exibido_no_site_estatico": "24/05/2026 14:00–15:00"
+  },
+  {
+    "slug": "vivian-caccuri-pele-azul-6894",
+    "nome": "Vivian Caccuri – Pele Azul",
+    "site_oficial": {
+      "start": "2026-05-24T14:00-03:00",
+      "end": "2026-05-24T15:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-23T18:00:00-03:00",
+      "end": "2026-05-23T19:00:00-03:00"
+    },
+    "exibido_no_site_estatico": "23/05/2026 18:00–19:00"
+  },
+  {
+    "slug": "illusion-games-espetaculo-de-ilusionismo-interativo-com-magico-breno-costa-cd48",
+    "nome": "Illusion Games - Espetáculo de Ilusionismo Interativo com Mágico Breno Costa",
+    "site_oficial": {
+      "start": "2026-05-24T16:00:00-03:00",
+      "end": "2026-05-24T17:00:00-03:00"
+    },
+    "meu_json": {
+      "start": "2026-05-24T10:00:00-03:00",
+      "end": "2026-05-24T11:00:00-03:00"
+    },
+    "exibido_no_site_estatico": "24/05/2026 10:00–11:00"
+  }
+]
